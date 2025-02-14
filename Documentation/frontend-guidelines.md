@@ -27,7 +27,7 @@
   - Body: `1rem`  
 
 ### Spacing  
-- Use Tailwind’s spacing scale (e.g., `p-4`, `gap-4`, `m-2`).  
+- Use Tailwind's spacing scale (e.g., `p-4`, `gap-4`, `m-2`).  
 - **Grid**: 12px baseline grid for alignment.  
 
 ---
@@ -48,6 +48,29 @@
   - Validation: 10MB max, JPG/PNG only.  
 - **Affection Gestures**:  
   - Disable button for 5s after sending to prevent spam.  
+
+### Timeline Layout  
+- **Grid System**:  
+  - Mobile: Single column
+  - Tablet: Two columns
+  - Desktop: Three columns
+  - Uses CSS columns for masonry-style layout
+  - 1.5rem (24px) gap between columns
+  - 1.5rem margin between posts vertically
+
+- **Post Cards**:  
+  - Rounded corners (lg = 0.5rem)
+  - Hover animation (slight lift)
+  - Shadow for depth
+  - Break-inside: avoid for clean column breaks
+  - Images maintain rounded top corners
+  - Consistent padding (1rem) for content
+
+- **Animations**:  
+  - Scale and fade on post entry/exit
+  - Smooth layout transitions
+  - Hover lift effect
+  - Menu fade in/out
 
 ---
 

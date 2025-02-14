@@ -19,8 +19,8 @@
 
 ### Partner Linking (Post-Signup)  
 1. **Dashboard** → "Invite Partner" button.  
-2. Enter partner’s email → Supabase triggers invitation email.  
-3. **Partner’s Flow**:  
+2. Enter partner's email → Supabase triggers invitation email.  
+3. **Partner's Flow**:  
    - Click invite link → Sign up → Couple profile auto-linked.  
 
 ### Log In  
@@ -41,7 +41,7 @@
 ---
 
 ## 4. Timeline Page
-- **Purpose**: Chronological feed of shared memories.  
+- **Purpose**: Chronological feed of shared memories and interactions.  
 - **Flow**:  
   1. Click "Add Memory" → Choose "Image" or "Text".  
   2. **Image Upload**:  
@@ -49,7 +49,11 @@
      - Add caption + tags (e.g., "Adventure", "Silly").  
   3. **Text Entry**:  
      - Write a note → Tag emotions (e.g., "❤️ Loving", "😂 Funny").  
-  4. Partner receives email notification (future) + sees entry in their timeline.  
+  4. **Quick Affection**:
+     - Send hugs/kisses via quick action bar
+     - View affection posts inline with memories
+     - Real-time notifications for received gestures
+  5. Partner receives email notification (future) + sees entry in their timeline.  
 
 ---
 
@@ -78,7 +82,7 @@
 - **Purpose**: Manage account settings.  
 - **Features**:  
   - **Edit Profile**: Update email/password.  
-  - **Partner Info**: View partner’s email/last active status.  
+  - **Partner Info**: View partner's email/last active status.  
   - **Log Out**: Button to sign out.  
 
 ---
@@ -86,6 +90,5 @@
 ## User Flow Summary (MVP)
 1. **Landing Page** → Sign Up → Verify Email → Dashboard.  
 2. **Dashboard** → Invite Partner → Partner Joins → Timeline.  
-3. **Timeline** → Upload Memory → Partner Views/Adds.  
-4. **Affection** → Send Gesture → Partner Receives.  
-5. **Hints** → Add Idea → Partner Acts.  
+3. **Timeline** → Upload Memory/Send Affection → Partner Views/Responds.  
+4. **Hints** → Add Idea → Partner Acts.  

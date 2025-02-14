@@ -27,40 +27,49 @@
    - Proper error handling for invitations
    - Real-time partner status updates
 
-## In Progress
-1. **Timeline Posts**
+3. **Timeline Posts**
    - Create timeline posts (text/images)
    - Edit timeline posts
    - Delete timeline posts
-   - View timeline in chronological grid
+   - View timeline in masonry-style grid
    - Add tags to posts
    - Image upload with drag-and-drop
+   - Rounded corners for images
+   - Responsive layout with 1/2/3 columns
+   - Proper spacing between posts
+   - Hover animations on posts
+   - Post menu with edit/delete options
+   - Tag suggestions system
+
+## In Progress
+1. **Profile Management**
+   - Profile section implementation
+   - Edit user profile
+   - Change password
+   - Update email
+   - View partner's profile
+   - Manage notifications
 
 ## Next Steps
-1. **Dashboard Layout**
-   - Implement responsive dashboard sidebar
-   - Create timeline view
-   - Add navigation between features
-   - Profile section
-   - Mobile-friendly layout
-
-## Future Features
-1. **Affection System**
-   - Send virtual hugs/kisses
-   - Receive affection notifications
-   - View affection history
-   - Basic emoji animations
-
-2. **Hint System**
+1. **Hint System**
    - Create hints for gifts/dates
    - Edit hints
    - Delete hints
    - Mark hints as fulfilled
    - Add links to hints
 
-3. **Profile Management**
-   - Edit user profile
-   - Change password
-   - Update email
-   - View partner's profile
-   - Manage notifications
+## Future Features
+1. **Quick Affection Feature**
+   - Integrate affection gestures into Timeline view
+   - Quick action bar for sending hugs/kisses
+   - Compact affection posts in timeline
+   - Real-time gesture notifications
+   - Simple animations for sending/receiving
+   - Cooldown system for gestures
+
+2. **Mobile Experience**
+   - Mobile-friendly layout
+   - Touch-optimized interactions
+   - Native-like animations
+   - Progressive Web App (PWA) features
+   - Mobile push notifications
