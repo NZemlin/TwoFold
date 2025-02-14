@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore';
 import PasswordInput from '../../components/common/PasswordInput';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, error, isLoading } = useAuthStore();
+  const { signIn, error, isLoading, user } = useAuthStore();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
   const successMessage = (location.state as { message?: string })?.message;
 
@@ -15,11 +16,17 @@ const LoginPage: React.FC = () => {
     password: '',
   });
 
+  // Redirect if user is already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await signIn(formData.email, formData.password);
-      navigate(from, { replace: true });
     } catch (err) {
       // Error is handled by the store
       console.error('Login failed:', err);
@@ -33,6 +40,10 @@ const LoginPage: React.FC = () => {
       [name]: value
     }));
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -53,19 +64,19 @@ const LoginPage: React.FC = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {successMessage && (
+            <div className="mb-4 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded relative">
+              {successMessage}
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative">
+              {error instanceof Error ? error.message : error}
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {successMessage && (
-              <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded relative" role="alert">
-                <span className="block sm:inline">{successMessage}</span>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative" role="alert">
-                <span className="block sm:inline">{error instanceof Error ? error.message : error}</span>
-              </div>
-            )}
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -79,7 +90,7 @@ const LoginPage: React.FC = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -89,7 +100,6 @@ const LoginPage: React.FC = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              autoComplete="current-password"
               label="Password"
             />
 

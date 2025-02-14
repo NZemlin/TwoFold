@@ -8,10 +8,10 @@ import VerifyEmailPage from './pages/auth/VerifyEmailPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import DashboardLayout from './components/layouts/DashboardLayout';
-import LoadingOverlay from './components/common/LoadingOverlay';
+import LoadingScreen from './components/LoadingScreen';
+import DashboardPage from './pages/DashboardPage';
 
-// Temporary dashboard pages (we'll implement these later)
-const DashboardPage: React.FC = () => <div>Dashboard/Timeline</div>;
+// Temporary pages (we'll implement these later)
 const AffectionPage: React.FC = () => <div>Affection</div>;
 const HintsPage: React.FC = () => <div>Hints</div>;
 const ProfilePage: React.FC = () => <div>Profile</div>;
@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   const location = useLocation();
 
   if (isLoading) {
-    return <LoadingOverlay message="Checking authentication..." />;
+    return <LoadingScreen />;
   }
 
   if (!user) {
@@ -33,11 +33,15 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 const App: React.FC = () => {
-  const { initialize } = useAuthStore();
+  const { initialize, isLoading } = useAuthStore();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Router>

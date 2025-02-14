@@ -40,6 +40,18 @@
     created_at TIMESTAMPTZ DEFAULT NOW()
   );
 
+  -- partner_invitations: Manages partner linking requests
+  CREATE TABLE partner_invitations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sender_id UUID REFERENCES users(id) NOT NULL,
+    recipient_email TEXT NOT NULL,
+    status TEXT CHECK (status IN ('pending', 'accepted', 'rejected', 'expired')) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 days'),
+    UNIQUE(sender_id, recipient_email)
+  );
+
   -- timeline_posts: Shared memories
   CREATE TABLE timeline_posts (
     id UUID PRIMARY KEY,

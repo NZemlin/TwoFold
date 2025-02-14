@@ -13,15 +13,21 @@
    - Responsive auth page layouts
    - Password visibility toggle
    - Form validation
+   - Persistent sessions across page refreshes
+   - Proper loading states during auth checks
+   - Smooth auth state transitions
 
-## In Progress
-1. **Partner Linking**
+2. **Partner Linking**
    - Invite partner via email
    - Accept/decline invitation system
    - Couple profile creation
    - Partner verification
+   - Proper UI state management for partner status
+   - Prevention of duplicate invitations
+   - Proper error handling for invitations
+   - Real-time partner status updates
 
-## Next Steps
+## In Progress
 1. **Timeline Posts**
    - Create timeline posts (text/images)
    - Edit timeline posts
@@ -30,7 +36,8 @@
    - Add tags to posts
    - Image upload with drag-and-drop
 
-2. **Dashboard Layout**
+## Next Steps
+1. **Dashboard Layout**
    - Implement responsive dashboard sidebar
    - Create timeline view
    - Add navigation between features

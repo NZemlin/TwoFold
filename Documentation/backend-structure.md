@@ -26,45 +26,58 @@ This document outlines the structure and architecture of the TwoFold backend, in
 
 ## Database Schema
 ### Users Table
-- **`userId`**: Primary key (UUID).
+- **`id`**: Primary key (UUID).
 - **`email`**: User email (unique).
-- **`passwordHash`**: Hashed password.
-- **`profileInfo`**: JSON object for additional user details (e.g., name, profile picture).
-- **`partnerId`**: Foreign key linking to the Users table (nullable).
+- **`partner_id`**: Foreign key linking to the Users table (nullable).
+- **`created_at`**: Timestamp of when the user was created.
+- **`updated_at`**: Timestamp of last update.
 
 ### Couples Table
-- **`coupleId`**: Primary key (UUID).
-- **`user1Id`**: Foreign key linking to the Users table.
-- **`user2Id`**: Foreign key linking to the Users table.
-- **`createdAt`**: Timestamp of when the couple was created.
+- **`id`**: Primary key (UUID).
+- **`user1_id`**: Foreign key linking to the Users table.
+- **`user2_id`**: Foreign key linking to the Users table.
+- **`created_at`**: Timestamp of when the couple was created.
+
+### Partner Invitations Table
+- **`id`**: Primary key (UUID, default gen_random_uuid()).
+- **`sender_id`**: Foreign key linking to the Users table.
+- **`recipient_email`**: Email of the recipient.
+- **`status`**: Status of the invitation (enum: "pending", "accepted", "rejected", "expired").
+- **`created_at`**: Timestamp of when the invitation was created.
+- **`updated_at`**: Timestamp of last update.
+- **`expires_at`**: Timestamp of when the invitation expires (default: 7 days from creation).
+- **Constraints**: 
+  - UNIQUE(sender_id, recipient_email)
+  - Status must be one of: 'pending', 'accepted', 'rejected', 'expired'
 
 ### Timeline Posts Table
-- **`postId`**: Primary key (UUID).
-- **`coupleId`**: Foreign key linking to the Couples table.
+- **`id`**: Primary key (UUID).
+- **`couple_id`**: Foreign key linking to the Couples table.
 - **`content`**: Text content of the post.
-- **`type`**: Type of post (e.g., "text", "image").
-- **`createdAt`**: Timestamp of when the post was created.
+- **`media_url`**: URL for any attached media.
+- **`type`**: Type of post (enum: "image", "text", "hint").
+- **`created_at`**: Timestamp of when the post was created.
 
 ### Affection Gestures Table
 - **`id`**: Primary key (UUID).
-- **`coupleId`**: Foreign key linking to the Couples table.
-- **`senderId`**: Foreign key linking to the Users table.
-- **`receiverId`**: Foreign key linking to the Users table.
+- **`couple_id`**: Foreign key linking to the Couples table.
+- **`sender_id`**: Foreign key linking to the Users table.
+- **`receiver_id`**: Foreign key linking to the Users table.
 - **`type`**: Type of gesture (enum: "hug", "kiss").
-- **`createdAt`**: Timestamp of when the gesture was sent.
-- **`updatedAt`**: Timestamp of last update.
+- **`created_at`**: Timestamp of when the gesture was sent.
+- **`updated_at`**: Timestamp of last update.
 
 ### Hints Table
 - **`id`**: Primary key (UUID).
-- **`coupleId`**: Foreign key linking to the Couples table.
-- **`creatorId`**: Foreign key linking to the Users table.
+- **`couple_id`**: Foreign key linking to the Couples table.
+- **`creator_id`**: Foreign key linking to the Users table.
 - **`content`**: Text content of the hint.
 - **`category`**: Category of hint (enum: "gift", "date_night", "experience", "other").
-- **`linkUrl`**: Optional URL for external reference.
-- **`isFulfilled`**: Boolean indicating if hint is completed.
-- **`fulfilledAt`**: Timestamp of when hint was marked as fulfilled.
-- **`createdAt`**: Timestamp of creation.
-- **`updatedAt`**: Timestamp of last update.
+- **`link_url`**: Optional URL for external reference.
+- **`is_fulfilled`**: Boolean indicating if hint is completed.
+- **`fulfilled_at`**: Timestamp of when hint was marked as fulfilled.
+- **`created_at`**: Timestamp of creation.
+- **`updated_at`**: Timestamp of last update.
 
 ---
 
@@ -117,6 +130,19 @@ This document outlines the structure and architecture of the TwoFold backend, in
 - **DELETE `/api/hints/:hintId`**: Delete a hint.
   - Response: `{ message: "Hint deleted" }`
 
+### Partner Invitation Endpoints
+- **POST `/api/invitations/send`**: Send a partner invitation
+  - Request Body: `{ recipientEmail: string }`
+  - Response: `{ id: string, recipientEmail: string, status: string, createdAt: string }`
+- **GET `/api/invitations/sent`**: Get invitations sent by the user
+  - Response: Array of `{ id: string, recipientEmail: string, status: string, createdAt: string }`
+- **GET `/api/invitations/received`**: Get invitations received by the user
+  - Response: Array of `{ id: string, senderEmail: string, status: string, createdAt: string }`
+- **PUT `/api/invitations/:id/accept`**: Accept a partner invitation
+  - Response: `{ coupleId: string, partnerId: string }`
+- **PUT `/api/invitations/:id/reject`**: Reject a partner invitation
+  - Response: `{ message: "Invitation rejected" }`
+
 ---
 
 ## Authentication
@@ -145,7 +171,7 @@ This document outlines the structure and architecture of the TwoFold backend, in
 ### Row Level Security (RLS)
 Row Level Security is implemented in Supabase to ensure data privacy and access control at the database level.
 
-#### Users Table Policies
+### Users Table Policies
 - **View Own Profile**: Users can only view their own profile
   ```sql
   auth.uid() = id
@@ -155,13 +181,38 @@ Row Level Security is implemented in Supabase to ensure data privacy and access 
   auth.uid() = id
   ```
 
-#### Couples Table Policies
+### Partner Invitations Table Policies
+- **View**: Users can view invitations they've sent or received
+  ```sql
+  auth.uid() = sender_id OR recipient_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+  ```
+- **Insert**: Users can only create invitations if they don't have a partner
+  ```sql
+  auth.uid() = sender_id 
+  AND NOT EXISTS (
+    SELECT 1 FROM users 
+    WHERE id = auth.uid() 
+    AND partner_id IS NOT NULL
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM partner_invitations 
+    WHERE sender_id = auth.uid() 
+    AND status = 'pending'
+  )
+  ```
+- **Update**: Users can only update invitations they've received
+  ```sql
+  recipient_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+  AND status = 'pending'
+  ```
+
+### Couples Table Policies
 - **View Own Couple**: Users can only view couples they're a part of
   ```sql
   auth.uid() = user1_id OR auth.uid() = user2_id
   ```
 
-#### Timeline Posts Policies
+### Timeline Posts Policies
 - **View**: Users can view posts from their couple
 - **Create**: Users can create posts for their couple
 - **Update**: Users can update any post in their couple
@@ -175,7 +226,7 @@ Row Level Security is implemented in Supabase to ensure data privacy and access 
   )
   ```
 
-#### Affection Gestures Policies
+### Affection Gestures Policies
 - **View**: Users can view all gestures in their couple
   ```sql
   EXISTS (
@@ -186,7 +237,6 @@ Row Level Security is implemented in Supabase to ensure data privacy and access 
   ```
 - **Create**: Users can only send gestures as themselves
   ```sql
-  -- Must be in the couple AND be the sender
   EXISTS (
     SELECT 1 FROM couples
     WHERE id = affection_gestures.couple_id
@@ -195,7 +245,7 @@ Row Level Security is implemented in Supabase to ensure data privacy and access 
   AND auth.uid() = sender_id
   ```
 
-#### Hints Policies
+### Hints Policies
 - **View**: Users can view all hints in their couple
 - **Create**: Users can create hints for their couple (must be creator)
 - **Update**: Users can update any hint in their couple
